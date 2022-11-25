@@ -15,9 +15,10 @@ app.get('/', function (req, res) {
     res.send('Todo API...');
 });
 
+// get /todos?q=work&completed = true
 app.get('/todos', function (req, res) {
 
-    var queryParams = req.query;
+    var queryParams = req.query; // accessing query parameters
     var filteredTodos = todos;
 
     if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
@@ -28,12 +29,13 @@ app.get('/todos', function (req, res) {
 
     if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
         filteredTodos = _.filter(filteredTodos, function (todo) {
-            return todo.description.indexOf(queryParams.q) > -1
+            return todo.description.indexOf(queryParams.q) > -1 // return true if value was 1 else -1
         });
     }
     res.json(filteredTodos);
 });
 
+// get /todos/:id
 app.get('/todos/:id', function (req, res) {
 
     var todoId = parseInt(req.params.id, 10);
@@ -47,6 +49,7 @@ app.get('/todos/:id', function (req, res) {
     
 });
 
+// post /todos
 app.post('/todos', function(req, res) {
 
     var body = _.pick(req.body, "description", "completed")
@@ -62,12 +65,14 @@ app.post('/todos', function(req, res) {
 
 });
 
+
+//put /todos/:id
 app.put('/todos/:id', function (req, res) {
 
     var todoId = parseInt(req.params.id, 10);
     var matchedTodo = _.findWhere(todos, {id: todoId});
 
-    var body = _.pick(req.body, 'description', 'completed');
+    var body = _.pick(req.body, 'description', 'completed'); //pick the specific objects
     var validAttributes = {};
 
     if (!matchedTodo) {
@@ -90,19 +95,21 @@ app.put('/todos/:id', function (req, res) {
     res.json(matchedTodo);
 });
 
+//delete /todos/:id
 app.delete('/todos/:id', function (req, res) {
 
     var todoId = parseInt(req.params.id, 10);
     var matchedTodo = _.findWhere(todos, {id: todoId});
 
     if (matchedTodo) {
-        todos = _.without(todos, matchedTodo);
+        todos = _.without(todos, matchedTodo); //delete the matchedtodo
         res.json(matchedTodo)
     } else {
         res.status(404).json({"error": "No todos found in that id."});
     }
 });
 
+// listening on port 3000 or heroku server
 app.listen(PORT, function () {
     console.log('Express listening in PORT ' + PORT + '!');
 });
