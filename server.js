@@ -4,6 +4,7 @@ var _ = require('underscore');
 
 var db = require('./db.js');
 const { where } = require('sequelize');
+const { functions } = require('underscore');
 
 var app = express();
 
@@ -126,6 +127,17 @@ app.delete('/todos/:id', function (req, res) {
         }
     }, function () {
         res.status(500).send();
+    });
+});
+
+app.post('/users', function (req, res) {
+
+    var body = _.pick(req.body, "email", "password");
+
+    db.user.create(body).then(function (user) {
+        res.status(200).json(user.toJSON());
+    }).catch(function (e) {
+        res.status(400).json(e);
     });
 });
 

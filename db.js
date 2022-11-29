@@ -8,6 +8,7 @@ var sequelize = new Sequelize(undefined, undefined, undefined, {
 var db = {};
 
 db.todo = require(__dirname + '/models/todo.js')(sequelize, Sequelize.DataTypes)
+db.user = require(__dirname + '/models/user.js')(sequelize, Sequelize.DataTypes)
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.Op = Op;
