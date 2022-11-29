@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 
+var db = require('./db.js');
+
 var app = express();
 
 var PORT = process.env.PORT || 3000;
@@ -54,14 +56,20 @@ app.post('/todos', function(req, res) {
 
     var body = _.pick(req.body, "description", "completed")
 
-    if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-        res.status(400).send();
-    } 
+    db.todo.create(body).then(function (todo) {
+        res.status(200).send(todo.toJSON());
+    }).catch(function (e) {
+        res.status(400).json({error: e});
+    })
 
-    body.description =body.description.trim();
-    body.id = todoNextId++;
-    todos.push(body);
-    res.send(body);
+    // if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+    //     res.status(400).send();
+    // } 
+
+    // body.description =body.description.trim();
+    // body.id = todoNextId++;
+    // todos.push(body);
+    // res.send(body);
 
 });
 
@@ -109,7 +117,12 @@ app.delete('/todos/:id', function (req, res) {
     }
 });
 
-// listening on port 3000 or heroku server
-app.listen(PORT, function () {
-    console.log('Express listening in PORT ' + PORT + '!');
+db.sequelize.sync().then(function () {
+
+    // listening on port 3000 or heroku server
+    app.listen(PORT, function () {
+        console.log('Express listening in PORT ' + PORT + '!');
+    });
 });
+
+
