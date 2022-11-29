@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var _ = require('underscore');
 
 var db = require('./db.js');
+const { where } = require('sequelize');
 
 var app = express();
 
@@ -111,14 +112,20 @@ app.put('/todos/:id', function (req, res) {
 app.delete('/todos/:id', function (req, res) {
 
     var todoId = parseInt(req.params.id, 10);
-    var matchedTodo = _.findWhere(todos, {id: todoId});
 
-    if (matchedTodo) {
-        todos = _.without(todos, matchedTodo); //delete the matchedtodo
-        res.json(matchedTodo)
-    } else {
-        res.status(404).json({"error": "No todos found in that id."});
-    }
+    db.todo.destroy({
+        where: {
+            id: todoId
+        }
+    }).then(function (rowsDeleted) {
+        if (rowsDeleted === 0) {
+            res.status(404).json({error: 'No todos found in that id'})
+        } else {
+            res.status(204).send();
+        }
+    }, function () {
+        res.status(500).send();
+    });
 });
 
 db.sequelize.sync().then(function () {
