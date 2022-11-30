@@ -1,10 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
-
+var bcrypt = require('bcrypt');
 var db = require('./db.js');
-const { where } = require('sequelize');
-const { functions } = require('underscore');
+
 
 var app = express();
 
@@ -141,7 +140,19 @@ app.post('/users', function (req, res) {
     });
 });
 
-db.sequelize.sync().then(function () {
+app.post('/users/login', function (req, res) {
+
+    var body = _.pick(req.body, 'email', 'password');
+
+    db.user.authenticate(body).then(function (user) {
+        res.status(200).json(user.toPublicJSON());
+    }).catch(function (e) {
+        res.status(401).json(e);
+    })
+    
+});
+
+db.sequelize.sync({force: true}).then(function () {
 
     // listening on port 3000 or heroku server
     app.listen(PORT, function () {

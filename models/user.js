@@ -42,8 +42,30 @@ module.exports = function (sequelize, DataTypes) {
             }
         }
     });
+    // user.authenticate is for declaring class methods.
+    user.authenticate = function (body) {
 
-    user.prototype.toPublicJSON = function () {
+        return new Promise (function (resolve, reject) {
+
+            if (typeof body.email !== 'string' || typeof body.password !== 'string') {
+                return reject();
+            }
+            user.findOne({
+                where: {
+                    email: body.email
+                }
+            }).then(function (user) {
+                if (!user || !bcrypt.compareSync(body.password, user.get('password_hash'))) {
+                    return reject();
+                }
+                resolve(user);
+            }).catch(function (e) {
+                reject();
+            });
+        });
+    }
+    //user.prototype is for declaring instance methods
+    user.prototype.toPublicJSON = function () {  
         var json = this.toJSON();
         return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
     }
