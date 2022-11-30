@@ -11,5 +11,10 @@ db.todo = require(__dirname + '/models/todo.js')(sequelize, Sequelize.DataTypes)
 db.user = require(__dirname + '/models/user.js')(sequelize, Sequelize.DataTypes)
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+//for accessing opeartorTypes
 db.Op = Op;
+
+//Applying associations to our tabels.
+db.todo.belongsTo(db.user);
+db.user.hasMany(db.todo);
 module.exports = db;
